@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmniVendor & Supply Portal — Modern Minimalist UI</title>
+
+    <!-- Tailwind CSS CDN with dark mode selector strategy -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Modern Glassmorphism Utilities - Dark Mode Defaults */
+        .dark .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dark .glass-card {
+            background: rgba(22, 30, 49, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dark .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px -10px rgba(79, 70, 229, 0.2);
+        }
+
+        .dark .glass-modal {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        /* Glassmorphism Utilities - Light Mode Overrides */
+        html:not(.dark) .glass-panel {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+        }
+
+        html:not(.dark) .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.03);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        html:not(.dark) .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px -8px rgba(79, 70, 229, 0.12);
+        }
+
+        html:not(.dark) .glass-modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 9999px;
+        }
+
+        html:not(.dark) ::-webkit-scrollbar-track {
+            background: rgba(241, 245, 249, 0.8);
+        }
+
+        html:not(.dark) ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 9999px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.99);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+            animation: pulseGlow 6s infinite ease-in-out;
+        }
+
+        tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .dark tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        html:not(.dark) tbody tr:hover {
+            background-color: rgba(241, 245, 249, 0.8);
+        }
+    </style>
+
+<script>if(!sessionStorage.getItem("omni_admin_token")) location.replace("/admin-login.html");</script>
+</head>
+
+<body class="h-full antialiased flex flex-col bg-slate-50 dark:bg-[#090d16] text-slate-800 dark:text-slate-200">
+
+    <!-- Ambient Glow Backgrounds -->
+    <div class="ambient-glow -top-32 -left-32"></div>
+    <div class="ambient-glow top-1/2 -right-32" style="animation-delay: 3s;"></div>
+
+    <!-- Top Navigation Header -->
+    <header
+        class="sticky top-0 z-40 bg-[#0d1321]/95 backdrop-blur-xl border-b border-indigo-500/20 shadow-sm px-4 lg:px-8 py-3 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center space-x-3.5 cursor-pointer" onclick="switchTab('dashboard')">
+                <div
+                    class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 shadow-lg shadow-indigo-500/20 text-white font-bold">
+                    <i class="fa-solid fa-cube text-lg"></i>
+
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base tracking-tight text-white flex items-center gap-2">
+                        Vendor Portal
+                        <span
+                            class="px-2 py-0.5 text-[10px] uppercase font-semibold tracking-wider bg-indigo-500/20 text-indigo-200 rounded-full border border-indigo-500/30">
+                            v2.4 Pro
+                        </span>
+                    </h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Enterprise Supply Chain &
+                        Logistics Hub
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Search, Theme Toggle & Actions -->
+            <div class="flex items-center space-x-2.5 sm:space-x-3">
+                <!-- Global Search -->
+                <div class="relative hidden sm:block w-60 lg:w-80">
+                    <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)"
+                        placeholder="Search anything (SKU, Vendor, PO)..."
+                        class="w-full bg-slate-100 dark:bg-slate-900/80 text-slate-900 dark:text-slate-200 text-xs rounded-xl pl-9 pr-3 py-2 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-500">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+                </div>
+
+                <!-- Light / Dark Theme Switcher Button -->
+                <button id="theme-toggle" onclick="toggleTheme()"
+                    class="p-2 w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-amber-300 hover:text-indigo-600 dark:hover:text-amber-200 border border-slate-200 dark:border-slate-700/60 transition-all flex items-center justify-center shadow-sm"
+                    title="Toggle Light/Dark Theme">
+                    <i id="theme-toggle-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+
+                <!-- Quick Category Trigger -->
+                <button onclick="openCategoryModal()"
+                    class="px-3 py-2 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700/60 transition-all flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-layer-group text-indigo-500 dark:text-indigo-400"></i>
+                    <span class="hidden md:inline">Categories</span>
+                </button>
+
+                <!-- Notifications Dropdown Trigger -->
+                <div class="relative">
+                    <button id="notif-btn" onclick="toggleNotifDrawer()"
+                        class="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 relative transition border border-transparent hover:border-slate-200 dark:hover:border-slate-800">
+                        <i class="fa-regular fa-bell text-base"></i>
+                        <span id="notif-badge"
+                            class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
+                    </button>
+
+                    <!-- Notifications Drawer Menu -->
+                    <div id="notif-drawer"
+                        class="hidden absolute right-0 mt-3 w-80 sm:w-96 glass-modal rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700/60 z-50 overflow-hidden animate-fade-in">
+                        <div
+                            class="p-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-100/80 dark:bg-slate-900/60">
+                            <span
+                                class="font-semibold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                <i class="fa-solid fa-bell text-indigo-500 dark:text-indigo-400"></i> Notifications
+                            </span>
+                            <button onclick="clearAllNotifications()"
+                                class="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 font-medium transition">Clear
+                                All</button>
+                        </div>
+                        <div id="notif-list"
+                            class="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/50">
+                            <!-- Dynamically populated notifications -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Profile Avatar -->
+                <button type="button" onclick="openProfileModal()" title="Open profile"
+                    class="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 text-left">
+                    <div
+                        class="w-8 h-8 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-bold text-xs text-white border border-indigo-400/30 shadow-inner">
+                        LA
+                    </div>
+                    <div class="hidden lg:block text-left">
+                        <p class="text-xs font-semibold text-white leading-none">Logistics Admin</p>
+                        <p class="text-[10px] text-gray-300 mt-0.5 leading-none">Global Supply Dept.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Wrapper -->
+    <div class="flex-1 max-w-7xl w-full mx-auto flex flex-col md:flex-row gap-6 p-4 lg:p-6">
+
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 shrink-0 flex flex-col gap-4">
+            <nav class="glass-panel rounded-2xl p-2.5 space-y-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-indigo-600 dark:text-white bg-indigo-50 dark:bg-indigo-600/20 border border-indigo-200 dark:border-indigo-500/30">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-chart-pie w-4 text-indigo-600 dark:text-indigo-400"></i>
+                        <span>Dashboard</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-indigo-500 dark:text-indigo-400"></i>
+                </button>
+
+                <button onclick="switchTab('vendors')" id="nav-vendors"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-handshake w-4 text-slate-400"></i>
+                        <span>Vendor Directory</span>
+                    </div>
+                    <span id="badge-vendors-count"
+                        class="px-2 py-0.5 text-[10px] bg-slate-200 dark:bg-slate-800 rounded-md text-slate-700 dark:text-slate-300 font-bold">0</span>
+                </button>
+
+                <button onclick="switchTab('inventory')" id="nav-inventory"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-boxes-packing w-4 text-slate-400"></i>
+                        <span>Inventory SKUs</span>
+                    </div>
+                    <span id="badge-skus-count"
+                        class="px-2 py-0.5 text-[10px] bg-slate-200 dark:bg-slate-800 rounded-md text-slate-700 dark:text-slate-300 font-bold">0</span>
+                </button>
+
+                <button onclick="switchTab('orders')" id="nav-orders"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-file-invoice-dollar w-4 text-slate-400"></i>
+                        <span>Purchase Orders</span>
+                    </div>
+                    <span id="badge-orders-count"
+                        class="px-2 py-0.5 text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 rounded-md font-bold">0</span>
+                </button>
+            </nav>
+
+            <!-- Active Category Summary Sidebar Card -->
+            <div class="glass-panel rounded-2xl p-4 text-xs space-y-3">
+                <div class="flex justify-between items-center">
+                    <span
+                        class="font-bold text-slate-500 dark:text-slate-400 tracking-wide uppercase text-[10px]">Supply
+                        Categories</span>
+                    <span id="cat-count-badge"
+                        class="px-2 py-0.5 bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-full font-bold text-[10px]">5
+                        Active</span>
+                </div>
+                <div id="sidebar-categories-list" class="flex flex-wrap gap-1.5 pt-1">
+                    <!-- Dynamic Category Pills -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dynamic Content Container -->
+        <main class="flex-1 min-w-0 space-y-6">
+
+            <!-- TAB 1: DASHBOARD OVERVIEW -->
+            <section id="tab-dashboard" class="space-y-6 animate-fade-in">
+                <!-- Top Banner -->
+                <div
+                    class="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative overflow-hidden">
+                    <div
+                        class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Executive
+                            Supply Overview
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Real-time stats across suppliers,
+                            custom
+                            inventory categories, and order fulfillment velocity.</p>
+                    </div>
+                    <div class="flex items-center space-x-2.5 shrink-0">
+                        <button onclick="openCategoryModal()"
+                            class="px-3.5 py-2 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-700/80 transition-all flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-plus text-indigo-500 dark:text-indigo-400"></i> Add Category
+                        </button>
+                        <button onclick="openVendorModal()"
+                            class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> New Vendor
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metric Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                Active
+                                Vendors</p>
+                            <h3 id="stat-total-vendors" class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+                                0</h3>
+                            <p
+                                class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-[9px]"></i> Registered Partners
+                            </p>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-building-user"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                Inventory
+                                SKUs</p>
+                            <h3 id="stat-total-skus" class="text-2xl font-black text-slate-900 dark:text-white mt-1">0
+                            </h3>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1"><span
+                                    id="stat-categories-count"
+                                    class="text-indigo-600 dark:text-indigo-400 font-semibold">0</span> Categories</p>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                Pending
+                                Orders</p>
+                            <h3 id="stat-pending-orders"
+                                class="text-2xl font-black text-amber-500 dark:text-amber-400 mt-1">0</h3>
+                            <p
+                                class="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium flex items-center gap-1">
+                                <i class="fa-solid fa-clock text-[9px]"></i> Requires Action
+                            </p>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+                        <div>
+                            <p
+                                class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                Total PO
+                                Spend</p>
+                            <h3 id="stat-total-spend"
+                                class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">$0.00
+                            </h3>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Fulfilled Orders Value</p>
+                        </div>
+                        <div
+                            class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-5 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3
+                                class="font-bold text-slate-800 dark:text-slate-200 text-xs tracking-wider uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-indigo-500 dark:text-indigo-400"></i> Stock by Item
+                            </h3>
+                        </div>
+                        <div class="h-60 relative flex items-center justify-center">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3
+                                class="font-bold text-slate-800 dark:text-slate-200 text-xs tracking-wider uppercase flex items-center gap-2">
+                                <i class="fa-solid fa-chart-simple text-emerald-500 dark:text-emerald-400"></i> Purchase
+                                Order Status
+                                Velocity
+                            </h3>
+                        </div>
+                        <div class="h-60 relative flex items-center justify-center">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick PO Action Table -->
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <div
+                        class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-100/50 dark:bg-slate-900/40">
+                        <h3
+                            class="font-bold text-slate-800 dark:text-slate-200 text-xs tracking-wider uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-bolt text-amber-500 dark:text-amber-400"></i> Recent Purchase Orders &
+                            Workflow
+                            Shortcuts
+                        </h3>
+                        <button onclick="switchTab('orders')"
+                            class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline transition">View
+                            All
+                            Orders &rarr;</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead
+                                class="bg-slate-100/80 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-3.5">PO Number</th>
+                                    <th class="p-3.5">Vendor</th>
+                                    <th class="p-3.5">Category</th>
+                                    <th class="p-3.5">Total Value</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5 text-right">Quick Transition</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-po-table-body"
+                                class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: VENDOR DIRECTORY -->
+            <section id="tab-vendors" class="hidden space-y-6 animate-fade-in">
+                <div
+                    class="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Vendor
+                            Directory</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Manage partner relationships, contact
+                            info, and
+                            custom supply offerings.</p>
+                    </div>
+                    <button onclick="openVendorModal()"
+                        class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Register New Vendor
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <div
+                        class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100/50 dark:bg-slate-900/40">
+                        <div class="relative w-full sm:w-72">
+                            <input type="text" id="vendor-search-input" onkeyup="renderVendorsTable()"
+                                placeholder="Search vendor name or contact..."
+                                class="w-full bg-slate-200/60 dark:bg-slate-900/90 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-800 text-xs rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-xs text-slate-500 dark:text-slate-400 font-medium">Filter
+                                Category:</label>
+                            <select id="vendor-cat-filter" onchange="renderVendorsTable()"
+                                class="bg-slate-200/60 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="ALL">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead
+                                class="bg-slate-100/80 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-3.5">Vendor Name</th>
+                                    <th class="p-3.5">Primary Category</th>
+                                    <th class="p-3.5">Contact Email</th>
+                                    <th class="p-3.5">Phone</th>
+                                    <th class="p-3.5">Rating</th>
+                                    <th class="p-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vendors-table-body"
+                                class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: INVENTORY STOCKS -->
+            <section id="tab-inventory" class="hidden space-y-6 animate-fade-in">
+
+                <div
+                    class="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                            Inventory SKUs & Stock Hub
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Track real-time stock levels, pricing, and log quick quantity adjustments.
+                        </p>
+                    </div>
+
+                    <button onclick="openItemModal()"
+                        class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add New SKU / Item
+                    </button>
+                </div>
+
+                <!-- Restock Suggestions: table ke bahar -->
+                <div class="glass-panel p-5 rounded-2xl space-y-3">
+                    <h3 class="font-bold text-slate-900 dark:text-white text-sm">
+                        <i class="fa-solid fa-cart-shopping text-amber-500 mr-2"></i>
+                        Restock Suggestions
+                    </h3>
+
+                    <div id="low-stock-suggestions" class="space-y-2">
+                        <!-- Suggestions appear here -->
+                    </div>
+                </div>
+
+                <!-- Inventory Table Panel -->
+                <div class="glass-panel rounded-2xl overflow-hidden">
+
+                    <div
+                        class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100/50 dark:bg-slate-900/40">
+
+                        <div class="relative w-full sm:w-72">
+                            <input type="text" id="inventory-search-input" onkeyup="renderInventoryTable()"
+                                placeholder="Search Item, SKU, or Description..."
+                                class="w-full bg-slate-200/60 dark:bg-slate-900/90 text-slate-900 dark:text-slate-200 border border-slate-300 dark:border-slate-800 text-xs rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:border-indigo-500">
+
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 dark:text-slate-500 text-xs"></i>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <label class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                Filter Category:
+                            </label>
+
+                            <select id="inventory-cat-filter" onchange="renderInventoryTable()"
+                                class="bg-slate-200/60 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="ALL">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead
+                                class="bg-slate-100/80 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-3.5">SKU Code</th>
+                                    <th class="p-3.5">Item Name</th>
+                                    <th class="p-3.5">Category</th>
+                                    <th class="p-3.5">Unit Price</th>
+                                    <th class="p-3.5">Stock Level</th>
+                                    <th class="p-3.5 text-center">Quick Adjust</th>
+                                    <th class="p-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="inventory-table-body"
+                                class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TAB 4: PURCHASE ORDERS -->
+
+            <section id="tab-orders" class="hidden space-y-6 animate-fade-in">
+                <div
+                    class="glass-panel p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                            Purchase Order Workflow
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                            Lifecycle Tracking: Pending &rarr; Approved &rarr; Mark Shipped &rarr; Received Delivery
+                            &rarr; Fulfilled.
+                        </p>
+                    </div>
+
+                    <button onclick="openNewPOModal()"
+                        class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-cart-plus"></i>
+                        New Purchase Order
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden">
+                    <div
+                        class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40">
+
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                            <div class="flex flex-wrap items-center gap-2">
+                                <label for="po-status-filter"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                    Filter Status:
+                                </label>
+
+                                <select id="po-status-filter" onchange="renderPOTable()"
+                                    class="bg-slate-200/60 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                                    <option value="ALL">All Statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Mark Shipped">Mark Shipped</option>
+                                    <option value="Received Delivery">Received Delivery</option>
+                                    <option value="Fulfilled">Fulfilled</option>
+                                </select>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2">
+                                <label for="po-month-filter"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                    Filter Month:
+                                </label>
+
+                                <input type="month" id="po-month-filter" onchange="renderPOTable()"
+                                    class="bg-slate-200/60 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+
+                                <button type="button" onclick="exportMonthlyPOs()"
+                                    class="px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel"></i>
+                                    Export Excel
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead
+                                class="bg-slate-100/80 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="p-3.5">PO Number</th>
+                                    <th class="p-3.5">Vendor</th>
+                                    <th class="p-3.5">Category</th>
+                                    <th class="p-3.5">Order Summary</th>
+                                    <th class="p-3.5">Total Spend</th>
+                                    <th class="p-3.5">Current Status</th>
+                                    <th class="p-3.5 text-right">Advance Workflow</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="po-table-body"
+                                class="divide-y divide-slate-200 dark:divide-slate-800/60 text-slate-700 dark:text-slate-300">
+                                <!-- Dynamic PO Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+        </main>
+    </div>
+
+    <!-- MODAL 1: CATEGORY MANAGEMENT -->
+    <div id="modal-categories"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-500 dark:text-indigo-400"></i> Manage Supply
+                    Categories
+                </h3>
+                <button onclick="closeCategoryModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"><i
+                        class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <!-- Add New Category Form -->
+            <form onsubmit="handleCreateCategory(event)"
+                class="bg-slate-100 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                <p class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Create
+                    New
+                    Category</p>
+
+                <input type="text" id="new-cat-name" required placeholder="Category name (e.g., Electronics)"
+                    class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                <div>
+                    <input type="hidden" id="new-cat-color" value="indigo">
+
+                    <label class="text-xs font-semibold block mb-2 text-slate-700 dark:text-slate-300">
+                        Choose Accent Color
+                    </label>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="selectCategoryColor('indigo')" data-color="indigo"
+                            class="color-choice border-2 border-indigo-500 rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-indigo-500 mb-1"></span>Indigo
+                        </button>
+
+                        <button type="button" onclick="selectCategoryColor('emerald')" data-color="emerald"
+                            class="color-choice border-2 border-transparent rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-emerald-500 mb-1"></span>Emerald
+                        </button>
+
+                        <button type="button" onclick="selectCategoryColor('amber')" data-color="amber"
+                            class="color-choice border-2 border-transparent rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-amber-500 mb-1"></span>Amber
+                        </button>
+
+                        <button type="button" onclick="selectCategoryColor('sky')" data-color="sky"
+                            class="color-choice border-2 border-transparent rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-sky-500 mb-1"></span>Sky Blue
+                        </button>
+
+                        <button type="button" onclick="selectCategoryColor('rose')" data-color="rose"
+                            class="color-choice border-2 border-transparent rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-rose-500 mb-1"></span>Rose
+                        </button>
+
+                        <button type="button" onclick="selectCategoryColor('purple')" data-color="purple"
+                            class="color-choice border-2 border-transparent rounded-lg p-2 text-xs">
+                            <span class="block h-6 rounded bg-purple-500 mb-1"></span>Purple
+                        </button>
+                    </div>
+                </div>
+
+                <input type="text" id="new-cat-desc" placeholder="Brief description (e.g., Electronics, Hardware)..."
+                    class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                <button type="submit"
+                    class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-lg transition shadow-md">Save
+                    Category</button>
+            </form>
+
+            <div class="space-y-2">
+                <p class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Existing
+                    Supply
+                    Categories</p>
+                <div id="modal-category-list" class="max-h-48 overflow-y-auto space-y-2 pr-1">
+                    <!-- Dynamic Pills -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: QUANTITY STOCK ADJUSTMENT -->
+    <div id="modal-adjust-stock"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-500 dark:text-indigo-400"></i> Stock Level Adjustment
+                </h3>
+                <button onclick="closeAdjustModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"><i
+                        class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <div class="text-xs bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
+                <p class="text-slate-600 dark:text-slate-400">SKU Item: <span id="adj-item-name"
+                        class="font-bold text-slate-900 dark:text-white"></span></p>
+            </div>
+
+            <form onsubmit="handleStockAdjustmentSubmit(event)" class="space-y-3">
+                <input type="hidden" id="adj-item-id">
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Current Stock
+                    </label>
+                    <div class="w-full flex items-center justify-between text-sm font-bold bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 text-indigo-700 dark:text-indigo-300 rounded-lg p-3">
+                        <span>Available quantity</span>
+                        <span><span id="adj-current-stock-display">0</span> units</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        New Total Stock Quantity
+                    </label>
+                    <input type="number" id="adj-quantity" min="0" step="1" required
+                        placeholder="Enter final stock quantity"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Audit Reason
+                    </label>
+                    <select id="adj-reason"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500">
+                        <option value="Restock Delivery">Restock Delivery</option>
+                        <option value="Production Allocation">Production Allocation</option>
+                        <option value="Damaged / Spoiled">Damaged / Spoiled</option>
+                        <option value="Inventory Audit Correction">Inventory Audit Correction</option>
+                        <option value="Customer Return">Customer Return</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeAdjustModal()"
+                        class="w-1/2 py-2 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-md">
+                        Update Stock
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- MODAL: EDIT SKU UNIT PRICE -->
+    <div id="modal-edit-price"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm">
+                    <i class="fa-solid fa-pen-to-square text-indigo-500 mr-2"></i>
+                    Adjust Unit Price
+                </h3>
+
+                <button type="button" onclick="closeEditPriceModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handlePriceUpdate(event)" class="space-y-4">
+                <input type="hidden" id="edit-price-item-id">
+
+                <div class="text-xs bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
+                    <p class="text-slate-500 dark:text-slate-400">SKU Item</p>
+                    <p id="edit-price-item-name" class="font-bold text-slate-900 dark:text-white mt-1"></p>
+                    <p class="text-slate-500 dark:text-slate-400 mt-2">Current Unit Price</p>
+                    <p id="edit-price-current" class="font-bold text-indigo-600 dark:text-indigo-400 mt-1"></p>
+                </div>
+
+                <div>
+                    <label for="edit-price-input" class="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        New Unit Price ($)
+                    </label>
+
+                    <input type="number" id="edit-price-input" min="0" step="0.01" required
+                        placeholder="Enter new price"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeEditPriceModal()"
+                        class="w-1/2 py-2 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition">
+                        Save Price
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: ADD NEW VENDOR -->
+    <div id="modal-vendor"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 id="vendor-modal-title" class="font-bold text-slate-900 dark:text-white text-sm">Register New Vendor
+                </h3>
+                <button onclick="closeVendorModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"><i
+                        class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <form id="vendor-form" onsubmit="handleCreateVendor(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Vendor / Company
+                        Name</label>
+                    <input type="text" id="v-name" required placeholder="e.g. Apex Logistics Corp"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Primary Supply
+                        Category</label>
+                    <select id="v-category" required
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1"></select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Email</label>
+                        <input type="email" id="v-email" required placeholder="contact@apex.com"
+                            class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Phone</label>
+                        <input type="text" id="v-phone" required placeholder="+1 (555) 019-283"
+                            class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                    </div>
+                </div>
+<div class="flex space-x-2 pt-3">
+                    <button type="button" onclick="closeVendorModal()"
+                        class="w-1/2 py-2 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Cancel</button>
+                    <button type="submit"
+                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-md">Register
+                        Vendor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: ADD NEW SKU ITEM -->
+    <div id="modal-item"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm">Add New SKU to Inventory</h3>
+                <button onclick="closeItemModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"><i
+                        class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <form onsubmit="handleCreateItem(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Select Vendor</label>
+                    <select id="item-vendor-select" required
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Category</label>
+                    <select id="item-cat-select" required
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Item Name</label>
+                    <input type="text" id="item-name" required placeholder="e.g. Ergonomic Keyboard"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Unit Price ($)</label>
+                        <input type="number" id="item-price" step="0.01" min="0" required placeholder="89.99"
+                            class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Initial Stock</label>
+                        <input type="number" id="item-stock" min="0" required placeholder="50"
+                            class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                    </div>
+                </div>
+
+                <div class="flex space-x-2 pt-3">
+                    <button type="button" onclick="closeItemModal()"
+                        class="w-1/2 py-2 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Cancel</button>
+                    <button type="submit"
+                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-md">Add
+                        SKU</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 5: NEW PURCHASE ORDER -->
+    <div id="modal-po"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm">Issue New Purchase Order</h3>
+                <button onclick="closeNewPOModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"><i
+                        class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+
+            <form onsubmit="handleCreatePO(event)" class="space-y-3">
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Select Vendor</label>
+                    <select id="po-vendor-select" onchange="updatePOItemsDropdown()" required
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Select Item SKU</label>
+                    <select id="po-item-select" required
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Quantity</label>
+                    <input type="number" id="po-quantity" min="1" required placeholder="10"
+                        class="w-full text-xs bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-200 rounded-lg p-2.5 focus:outline-none focus:border-indigo-500 mt-1">
+                </div>
+
+                <div class="flex space-x-2 pt-3">
+                    <button type="button" onclick="closeNewPOModal()"
+                        class="w-1/2 py-2 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Cancel</button>
+                    <button type="submit"
+                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-md">Create
+                        Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Profile dialog: intentionally uses the existing visual style -->
+    <div id="modal-profile"
+        class="fixed inset-0 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700/80 space-y-4 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-slate-900 dark:text-white text-sm"><i
+                        class="fa-solid fa-user-circle text-indigo-500 mr-2"></i>Profile</h3>
+                <button onclick="closeProfileModal()"
+                    class="text-slate-400 hover:text-slate-900 dark:hover:text-white transition p-1"
+                    aria-label="Close profile"><i class="fa-solid fa-xmark text-base"></i></button>
+            </div>
+            <div
+                class="flex items-center gap-3 p-3 rounded-xl bg-slate-100 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800">
+                <div
+                    class="w-11 h-11 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center font-bold text-sm text-white">
+                    LA</div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">Logistics Admin</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Global Supply Dept.</p>
+                </div>
+            </div>
+            <div class="space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                <p><span class="font-semibold">Role:</span> Administrator</p>
+                <p><span class="font-semibold">Portal:</span> OmniVendor & Supply Portal</p>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-2">
+                <p class="text-xs text-slate-500 dark:text-slate-400">Permanently remove all saved vendors, inventory,
+                    categories, purchase orders, and notifications from this browser.</p>
+                <button type="button" onclick="openDeleteAllConfirmation()"
+                    class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition"><i
+                        class="fa-solid fa-trash-can mr-2"></i>Delete All Data</button>
+            </div>
+        </div>
+    </div>
+    <div id="modal-delete-all-confirm"
+        class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-[60] hidden flex items-center justify-center p-4">
+        <div
+            class="glass-modal rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-rose-500/30 space-y-4 animate-fade-in">
+            <h3 class="font-bold text-slate-900 dark:text-white text-sm"><i
+                    class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i>Delete all data?</h3>
+            <p class="text-xs leading-5 text-slate-600 dark:text-slate-300">This will permanently delete all saved
+                vendors, inventory items, supply categories, purchase orders, and notifications. <strong>This action
+                    cannot be undone or recovered.</strong></p>
+            <div class="flex gap-2"><button type="button" onclick="closeDeleteAllConfirmation()"
+                    class="w-1/2 py-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300">Cancel</button><button
+                    type="button" onclick="deleteAllData()"
+                    class="w-1/2 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold">Yes, Delete
+                    All</button></div>
+        </div>
+    </div>
+
+    <script>
+        // State Collections
+        let categories = [
+            { id: 'cat-1', name: 'IT & Hardware', color: 'indigo', desc: 'Laptops, Monitors, Peripherals' },
+            { id: 'cat-2', name: 'Office Furniture', color: 'emerald', desc: 'Ergonomic Chairs, Desks' },
+            { id: 'cat-3', name: 'Paper & Stationery', color: 'amber', desc: 'Print Paper, Pens, Envelopes' },
+            { id: 'cat-4', name: 'Packaging Supplies', color: 'sky', desc: 'Corrugated Boxes, Bubble Wrap' },
+            { id: 'cat-5', name: 'Facility Maintenance', color: 'rose', desc: 'Cleaning Supplies, Safety Gear' }
+        ];
+
+        let vendors = [
+            { id: 'v-101', name: 'Nexus Tech Global', categoryId: 'cat-1', email: 'sales@nexustech.io', phone: '+1 800-555-0192', rating: 4.9 },
+            { id: 'v-102', name: 'ErgoComfort Ltd', categoryId: 'cat-2', email: 'orders@ergocomfort.com', phone: '+1 888-443-9011', rating: 4.7 },
+            { id: 'v-103', name: 'PaperCraft Solutions', categoryId: 'cat-3', email: 'support@papercraft.org', phone: '+1 800-221-8844', rating: 4.5 },
+            { id: 'v-104', name: 'PackRight Industry', categoryId: 'cat-4', email: 'b2b@packright.com', phone: '+1 877-990-1122', rating: 4.8 }
+        ];
+
+        let items = [
+            { id: 'sku-1', name: 'UltraWide Monitor 34"', vendorId: 'v-101', categoryId: 'cat-1', price: 499.99, stock: 42 },
+            { id: 'sku-2', name: 'Ergonomic Mesh Chair', vendorId: 'v-102', categoryId: 'cat-2', price: 280.00, stock: 15 },
+            { id: 'sku-3', name: 'Recycled Copy Paper A4', vendorId: 'v-103', categoryId: 'cat-3', price: 34.50, stock: 180 },
+            { id: 'sku-4', name: 'Heavy Duty Shipping Box L', vendorId: 'v-104', categoryId: 'cat-4', price: 2.20, stock: 850 },
+            { id: 'sku-5', name: 'Wireless Mechanical Keyboard', vendorId: 'v-101', categoryId: 'cat-1', price: 119.00, stock: 8 }
+        ];
+
+        let purchaseOrders = [
+            { id: 'PO-9021', vendorId: 'v-101', categoryId: 'cat-1', itemId: 'sku-1', quantity: 10, totalCost: 4999.90, status: 'Pending', date: '2026-10-02' },
+            { id: 'PO-9022', vendorId: 'v-102', categoryId: 'cat-2', itemId: 'sku-2', quantity: 5, totalCost: 1400.00, status: 'Approved', date: '2026-10-04' },
+            { id: 'PO-9023', vendorId: 'v-103', categoryId: 'cat-3', itemId: 'sku-3', quantity: 50, totalCost: 1725.00, status: 'Mark Shipped', date: '2026-10-05' },
+            { id: 'PO-9024', vendorId: 'v-104', categoryId: 'cat-4', itemId: 'sku-4', quantity: 300, totalCost: 660.00, status: 'Fulfilled', date: '2026-10-01' }
+        ];
+
+        let notifications = [
+            { id: 'n-1', title: 'Low Stock Alert', text: 'Wireless Mechanical Keyboard is down to 8 units.', time: '10m ago', unread: true },
+            { id: 'n-2', title: 'PO Update', text: 'PO-9024 marked as Fulfilled by Logistics.', time: '1h ago', unread: true },
+            { id: 'n-3', title: 'Vendor Added', text: 'PackRight Industry added to directory.', time: '1d ago', unread: false }
+        ];
+
+        // Local cache + shared backend sync. The server is the source of truth once connected.
+        const APP_DATA_KEY = 'omnivendor_portal_data_v1';
+        const API_BASE = '';
+        const adminToken = sessionStorage.getItem('omni_admin_token') || '';
+        let apiReady = false, syncBusy = false, lastRemoteSnapshot = '';
+        function currentPortalData() { return { categories, vendors, items, purchaseOrders, notifications }; }
+        function applyPortalData(saved) {
+            if (!saved || typeof saved !== 'object') return;
+            if (Array.isArray(saved.categories)) categories = saved.categories;
+            if (Array.isArray(saved.vendors)) vendors = saved.vendors;
+            if (Array.isArray(saved.items)) items = saved.items;
+            if (Array.isArray(saved.purchaseOrders)) purchaseOrders = saved.purchaseOrders;
+            if (Array.isArray(saved.notifications)) notifications = saved.notifications;
+        }
+        function loadAppData() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(APP_DATA_KEY) || 'null');
+                const looksLikeAccidentalEmptySync = saved &&
+                    Array.isArray(saved.categories) && saved.categories.length === 0 &&
+                    Array.isArray(saved.vendors) && saved.vendors.length === 0 &&
+                    Array.isArray(saved.items) && saved.items.length === 0 &&
+                    Array.isArray(saved.purchaseOrders) && saved.purchaseOrders.length === 0;
+                // Keep the built-in starter data if an earlier broken sync cached empty arrays.
+                if (!looksLikeAccidentalEmptySync) applyPortalData(saved);
+            } catch (error) { console.warn('Could not load saved portal data.', error); }
+        }
+        function saveAppData() {
+            const data = currentPortalData();
+            try { localStorage.setItem(APP_DATA_KEY, JSON.stringify(data)); } catch (error) {}
+            if (apiReady && !syncBusy) syncAdminData(data).catch(() => setSyncStatus('Offline — changes saved locally', false));
+        }
+        function setSyncStatus(message, connected = true) {
+            const el = document.getElementById('sync-status'); if (!el) return;
+            el.textContent = 'Sync: ' + message;
+            el.className = 'fixed bottom-3 right-3 z-[80] px-3 py-2 rounded-xl text-[11px] font-semibold shadow-lg ' + (connected ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white');
+        }
+        async function adminFetch(path, options = {}) {
+            const response = await fetch(path, { ...options, headers: { 'Content-Type': 'application/json', ...(adminToken ? { Authorization: 'Bearer ' + adminToken } : {}), ...(options.headers || {}) } });
+            const payload = await response.json().catch(() => ({}));
+            if (response.status === 401) { sessionStorage.removeItem('omni_admin_token'); location.href = '/admin-login.html'; }
+            if (!response.ok) throw new Error(payload.error || 'Server request failed');
+            return payload;
+        }
+        async function syncAdminData(data) {
+            const payload = await adminFetch('/api/admin/data', { method: 'PUT', body: JSON.stringify({ data }) });
+            if (payload.data) {
+                applyPortalData(payload.data);
+                localStorage.setItem(APP_DATA_KEY, JSON.stringify(currentPortalData()));
+                refreshAdminViews();
+            }
+            lastRemoteSnapshot = JSON.stringify(payload.data || data);
+            setSyncStatus('Connected · live sync');
+        }
+        function refreshAdminViews() {
+            renderCategoryPills(); renderVendorsTable(); renderInventoryTable(); renderPOTable();
+            renderNotifications(); updateDashboardMetrics(); updateCharts();
+            if (typeof renderLowStockSuggestions === 'function') renderLowStockSuggestions();
+        }
+        async function startAdminSync() {
+            if (!adminToken) { location.href = '/admin-login.html'; return; }
+            try {
+                const remote = await adminFetch('/api/admin/data');
+                if (remote.initialized && remote.data) {
+                    applyPortalData(remote.data); localStorage.setItem(APP_DATA_KEY, JSON.stringify(currentPortalData()));
+                    lastRemoteSnapshot = JSON.stringify(remote.data); refreshAdminViews();
+                } else {
+                    await syncAdminData(currentPortalData());
+                }
+                apiReady = true; setSyncStatus('Connected · live sync');
+                setInterval(async () => {
+                    if (syncBusy || !apiReady) return;
+                    try {
+                        const latest = await adminFetch('/api/admin/data');
+                        const snapshot = JSON.stringify(latest.data || {});
+                        if (latest.initialized && snapshot !== lastRemoteSnapshot) {
+                            syncBusy = true; applyPortalData(latest.data); localStorage.setItem(APP_DATA_KEY, JSON.stringify(currentPortalData()));
+                            lastRemoteSnapshot = snapshot; refreshAdminViews(); syncBusy = false;
+                        }
+                        setSyncStatus('Connected · live sync');
+                    } catch (e) { syncBusy = false; setSyncStatus('Reconnecting…', false); }
+                }, 3000);
+            } catch (error) {
+                apiReady = false; setSyncStatus('Server unavailable', false);
+                console.warn('OmniVendor backend sync:', error.message);
+            }
+        }
+
+        // Global Chart Objects
+        let categoryChartInstance = null;
+        let statusChartInstance = null;
+
+        // LIGHT / DARK MODE CONTROLLER
+        function initTheme() {
+            const savedTheme = localStorage.getItem('omni_portal_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
+            } else {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            }
+        }
+
+        function selectCategoryColor(color) {
+            document.getElementById('new-cat-color').value = color;
+
+            document.querySelectorAll('.color-choice').forEach(button => {
+                button.classList.toggle(
+                    'border-indigo-500',
+                    button.dataset.color === color
+                );
+                button.classList.toggle(
+                    'border-transparent',
+                    button.dataset.color !== color
+                );
+            });
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('omni_portal_theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+            updateCharts(); // Re-render charts with updated theme colors
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById('theme-toggle-icon');
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun text-amber-300 text-sm';
+            } else {
+                icon.className = 'fa-solid fa-moon text-slate-700 text-sm';
+            }
+        }
+
+        // Helper functions for lookup
+        const getCategory = (id) => categories.find(c => c.id === id) || { name: 'General', color: 'indigo' };
+        const getVendor = (id) => vendors.find(v => v.id === id) || { name: 'Unknown Vendor' };
+        const getItem = (id) => items.find(i => i.id === id) || { name: 'Unknown SKU' };
+
+        // Badge styling helpers
+        function getColorClasses(colorName) {
+            const map = {
+                indigo: 'bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
+                emerald: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+                amber: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+                sky: 'bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30',
+                rose: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
+                purple: 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30'
+            };
+            return map[colorName] || map.indigo;
+        }
+
+        function getPOBadge(status) {
+            switch (status) {
+                case 'Pending': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"><i class="fa-solid fa-clock text-[8px] mr-1"></i>Pending</span>';
+                case 'Accepted': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30">Accepted</span>';
+                case 'Approved': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30"><i class="fa-solid fa-check text-[8px] mr-1"></i>Approved</span>';
+                case 'Processing': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">Processing</span>';
+                case 'Shipped': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30"><i class="fa-solid fa-truck-fast text-[8px] mr-1"></i>Shipped</span>';
+                case 'Rejected': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30">Rejected</span>';
+                case 'Mark Shipped': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30"><i class="fa-solid fa-truck-fast text-[8px] mr-1"></i>Shipped</span>';
+                case 'Received Delivery': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30"><i class="fa-solid fa-box text-[8px] mr-1"></i>Received</span>';
+                case 'Fulfilled': return '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"><i class="fa-solid fa-circle-check text-[8px] mr-1"></i>Fulfilled</span>';
+                default: return status;
+            }
+        }
+
+        function switchTab(tabId) {
+            ['dashboard', 'vendors', 'inventory', 'orders'].forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const navBtn = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    section.classList.remove('hidden');
+                    if (navBtn) {
+                        navBtn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-indigo-600 dark:text-white bg-indigo-50 dark:bg-indigo-600/20 border border-indigo-200 dark:border-indigo-500/30";
+                    }
+                } else {
+                    section.classList.add('hidden');
+                    if (navBtn) {
+                        navBtn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50";
+                    }
+                }
+            });
+        }
+
+        function renderCategoryPills() {
+            const container = document.getElementById('sidebar-categories-list');
+            const modalList = document.getElementById('modal-category-list');
+            const badge = document.getElementById('cat-count-badge');
+
+            badge.textContent = `${categories.length} Active`;
+
+            container.innerHTML = categories.map(c => `
+        <span class="px-2 py-1 rounded-md text-[10px] font-medium border ${getColorClasses(c.color)}">
+          ${c.name}
+        </span>
+      `).join('');
+
+            modalList.innerHTML = categories.map(c => `
+        <div class="flex items-center justify-between p-2.5 bg-slate-100/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <div>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${getColorClasses(c.color)}">${c.name}</span>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${c.desc || 'No description provided'}</p>
+          </div>
+          <button onclick="removeCategory('${c.id}')" class="text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 text-xs px-2 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+
+            const catOptionsHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            const filterCatHTML = `<option value="ALL">All Categories</option>` + catOptionsHTML;
+
+            document.getElementById('vendor-cat-filter').innerHTML = filterCatHTML;
+            document.getElementById('inventory-cat-filter').innerHTML = filterCatHTML;
+            document.getElementById('v-category').innerHTML = catOptionsHTML;
+            document.getElementById('item-cat-select').innerHTML = catOptionsHTML;
+            renderLowStockSuggestions();
+            saveAppData();
+
+        }
+
+        function getVendorEmailLink(email, vendorName) {
+            const subject = `Supply Inquiry - ${vendorName}`;
+            const body = `Hello ${vendorName},\n\nI hope you are doing well.\n\nI am contacting you regarding your products and supplies. Please share the latest availability, pricing, and delivery details.\n\nThank you.`;
+            // Open Gmail's browser-based compose window instead of the device's default mail app.
+            return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        function getVendorWhatsAppLink(phone, vendorName) {
+            let number = String(phone || '').replace(/\D/g, '');
+            // If a 10-digit local Indian number is entered, add India's country code.
+            if (number.length === 10) number = '91' + number;
+            const message = `Hello ${vendorName}, I am contacting you regarding your products and supplies. Could you please share the latest availability, pricing, and delivery details?`;
+            return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+        }
+
+        function renderVendorsTable() {
+            const search = document.getElementById('vendor-search-input').value.toLowerCase();
+            const filterCat = document.getElementById('vendor-cat-filter').value;
+            const tbody = document.getElementById('vendors-table-body');
+
+            const filtered = vendors.filter(v => {
+                const matchesSearch = v.name.toLowerCase().includes(search) || v.email.toLowerCase().includes(search);
+                const matchesCat = filterCat === 'ALL' || v.categoryId === filterCat;
+                return matchesSearch && matchesCat;
+            });
+
+            document.getElementById('badge-vendors-count').textContent = vendors.length;
+
+            tbody.innerHTML = filtered.map(v => {
+                const cat = getCategory(v.categoryId);
+                return `
+          <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/40">
+            <td class="p-3.5 font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">
+                ${v.name.charAt(0)}
+              </div>
+              ${v.name}
+            </td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${getColorClasses(cat.color)}">${cat.name}</span>
+            </td>
+            <td class="p-3.5">
+              <div class="inline-flex items-center gap-2">
+                <span class="text-slate-600 dark:text-slate-400">${v.email}</span>
+                <a href="${getVendorEmailLink(v.email, v.name)}" title="Compose email to ${v.name}" aria-label="Email ${v.name}"
+                   class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:text-rose-400 transition" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-solid fa-envelope"></i>
+                </a>
+              </div>
+            </td>
+            <td class="p-3.5">
+              <div class="inline-flex items-center gap-2">
+                <span class="text-slate-600 dark:text-slate-400">${v.phone}</span>
+                <a href="${getVendorWhatsAppLink(v.phone, v.name)}" title="Message ${v.name} on WhatsApp" aria-label="WhatsApp ${v.name}"
+                   class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400 transition" target="_blank" rel="noopener noreferrer">
+                  <i class="fa-brands fa-whatsapp text-base"></i>
+                </a>
+              </div>
+            </td>
+            <td class="p-3.5 font-medium text-amber-500 dark:text-amber-400">
+              <i class="fa-solid fa-star text-[10px]"></i> ${v.rating}
+            </td>
+            <td class="p-3.5 text-right space-x-2">
+              <button onclick="openVendorModal('${v.id}')" title="Edit vendor" class="p-1.5 text-indigo-500 hover:text-indigo-600 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteVendor('${v.id}')" title="Delete vendor" class="p-1.5 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+            }).join('');
+            saveAppData();
+        }
+
+        function renderInventoryTable() {
+            const search = document.getElementById('inventory-search-input').value.toLowerCase();
+            const filterCat = document.getElementById('inventory-cat-filter').value;
+            const tbody = document.getElementById('inventory-table-body');
+
+            const filtered = items.filter(i => {
+                const matchesSearch = i.name.toLowerCase().includes(search) || i.id.toLowerCase().includes(search);
+                const matchesCat = filterCat === 'ALL' || i.categoryId === filterCat;
+                return matchesSearch && matchesCat;
+            });
+
+            document.getElementById('badge-skus-count').textContent = items.length;
+
+            tbody.innerHTML = filtered.map(i => {
+                const cat = getCategory(i.categoryId);
+                const stockStatus = i.stock > 20
+                    ? `<span class="px-2 py-0.5 text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 rounded font-semibold border border-emerald-500/30">${i.stock} units</span>`
+                    : (i.stock > 0
+                        ? `<span class="px-2 py-0.5 text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-300 rounded font-semibold border border-amber-500/30">${i.stock} Low Stock</span>`
+                        : `<span class="px-2 py-0.5 text-[10px] bg-rose-500/15 text-rose-700 dark:text-rose-300 rounded font-semibold border border-rose-500/30">Out of Stock</span>`);
+
+                return `
+          <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/40">
+            <td class="p-3.5 font-mono text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">${i.id.toUpperCase()}</td>
+            <td class="p-3.5 font-semibold text-slate-900 dark:text-white">${i.name}</td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${getColorClasses(cat.color)}">${cat.name}</span>
+            </td>
+            
+            <td class="p-3.5">
+                <div class="inline-flex items-center gap-2 whitespace-nowrap">
+                    <span class="font-medium text-slate-800 dark:text-slate-200">
+                        $${Number(i.price).toFixed(2)}
+                    </span>
+
+                    <button type="button"
+                        onclick="openEditPriceModal('${i.id}')"
+                        title="Edit unit price"
+                        aria-label="Edit price for ${i.name}"
+                        class="p-1.5 rounded-lg text-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/10 transition">
+                        <i class="fa-solid fa-pencil text-[11px]"></i>
+                    </button>
+                </div>
+            </td>
+
+            <td class="p-3.5">${stockStatus}</td>
+            <td class="p-3.5 text-center">
+              <button onclick="openAdjustModal('${i.id}')" class="px-2.5 py-1 bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-300 rounded-lg border border-slate-300 dark:border-slate-700/80 text-[11px] font-semibold transition flex items-center gap-1 mx-auto">
+                <i class="fa-solid fa-sliders text-[10px]"></i> Adjust
+              </button>
+            </td>
+            <td class="p-3.5 text-right">
+              <button onclick="deleteItem('${i.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+            }).join('');
+            saveAppData();
+        }
+
+        function openEditPriceModal(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('edit-price-item-id').value = item.id;
+            document.getElementById('edit-price-item-name').textContent = item.name;
+            document.getElementById('edit-price-current').textContent =
+                `$${Number(item.price).toFixed(2)}`;
+            document.getElementById('edit-price-input').value = item.price;
+
+            document.getElementById('modal-edit-price').classList.remove('hidden');
+            document.getElementById('edit-price-input').focus();
+        }
+
+        function closeEditPriceModal() {
+            document.getElementById('modal-edit-price').classList.add('hidden');
+        }
+
+        function handlePriceUpdate(e) {
+            e.preventDefault();
+
+            const itemId = document.getElementById('edit-price-item-id').value;
+            const newPrice = Number(document.getElementById('edit-price-input').value);
+            const item = items.find(i => i.id === itemId);
+
+            if (!item || !Number.isFinite(newPrice) || newPrice < 0) {
+                alert('Please enter a valid price.');
+                return;
+            }
+
+            const oldPrice = Number(item.price);
+            item.price = Math.round(newPrice * 100) / 100;
+
+            // Update existing purchase orders that have not been fulfilled.
+            purchaseOrders.forEach(po => {
+                if (po.itemId === itemId && po.status !== 'Fulfilled') {
+                    po.totalCost = Math.round(item.price * po.quantity * 100) / 100;
+                }
+            });
+
+            pushNotification(
+                'Unit Price Updated',
+                `${item.name}: $${oldPrice.toFixed(2)} → $${item.price.toFixed(2)}`
+            );
+
+            renderInventoryTable();
+            renderPOTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+
+            closeEditPriceModal();
+        }
+
+        function renderPOTable() {
+            const filterStatus = document.getElementById('po-status-filter').value;
+            const tbody = document.getElementById('po-table-body');
+            const dashBody = document.getElementById('dash-po-table-body');
+
+            const selectedMonth = document.getElementById('po-month-filter').value;
+
+            const filtered = purchaseOrders.filter(po => {
+                const matchesStatus =
+                    filterStatus === 'ALL' || po.status === filterStatus;
+
+                const matchesMonth =
+                    !selectedMonth || (po.date && po.date.startsWith(selectedMonth));
+
+                return matchesStatus && matchesMonth;
+            });
+
+            document.getElementById('badge-orders-count').textContent = purchaseOrders.filter(p => p.status === 'Pending').length;
+
+            const rowsHTML = filtered.map(po => {
+                const v = getVendor(po.vendorId);
+                const cat = getCategory(po.categoryId);
+                const item = getItem(po.itemId);
+
+                return `
+          <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/40">
+            <td class="p-3.5 font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">${po.id}</td>
+            <td class="p-3.5 font-semibold text-slate-900 dark:text-white">${v.name}</td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${getColorClasses(cat.color)}">${cat.name}</span>
+            </td>
+            <td class="p-3.5 text-slate-700 dark:text-slate-300">${item.name} &times; <span class="font-bold text-slate-900 dark:text-white">${po.quantity}</span></td>
+            <td class="p-3.5 font-bold text-emerald-600 dark:text-emerald-400">$${po.totalCost.toFixed(2)}</td>
+            <td class="p-3.5">${getPOBadge(po.status)}</td>
+            <td class="p-3.5 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-2">
+                <select aria-label="Change status for ${po.id}" onchange="setPOStatus('${po.id}', this.value)" class="max-w-40 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-[10px] text-slate-700 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+                  ${['Pending', 'Accepted', 'Approved', 'Processing', 'Mark Shipped', 'Shipped', 'Received Delivery', 'Fulfilled', 'Rejected'].map(status => `<option value="${status}" ${po.status === status ? 'selected' : ''}>${status}</option>`).join('')}
+                </select>
+                <button type="button" onclick="deletePurchaseOrder('${po.id}')" title="Delete purchase order" aria-label="Delete ${po.id}" class="p-1.5 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+            }).join('');
+
+            tbody.innerHTML = rowsHTML;
+
+            // Dashboard Quick Table Preview (First 5 orders)
+            dashBody.innerHTML = purchaseOrders.slice(0, 5).map(po => {
+                const v = getVendor(po.vendorId);
+                const cat = getCategory(po.categoryId);
+
+                return `
+          <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/40">
+            <td class="p-3.5 font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">${po.id}</td>
+            <td class="p-3.5 font-semibold text-slate-900 dark:text-white">${v.name}</td>
+            <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[10px] font-semibold border ${getColorClasses(cat.color)}">${cat.name}</span></td>
+            <td class="p-3.5 font-bold text-emerald-600 dark:text-emerald-400">$${po.totalCost.toFixed(2)}</td>
+            <td class="p-3.5">${getPOBadge(po.status)}</td>
+            <td class="p-3.5 text-right">${getPOTransitionButton(po)}</td>
+          </tr>
+        `;
+            }).join('');
+            saveAppData();
+        }
+
+        function getPOTransitionButton(po) {
+            if (po.status === 'Pending') {
+                return `<button onclick="advancePO('${po.id}', 'Approved')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold shadow transition">Approve</button>`;
+            } else if (po.status === 'Approved') {
+                return `<button onclick="advancePO('${po.id}', 'Mark Shipped')" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[10px] font-bold shadow transition">Ship Order</button>`;
+            } else if (po.status === 'Mark Shipped') {
+                return `<button onclick="advancePO('${po.id}', 'Received Delivery')" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-[10px] font-bold shadow transition">Receive Delivery</button>`;
+            } else if (po.status === 'Received Delivery') {
+                return `<button onclick="advancePO('${po.id}', 'Fulfilled')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow transition">Mark Fulfilled</button>`;
+            } else {
+                return `<span class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Completed</span>`;
+            }
+        }
+
+        function setPOStatus(poId, nextStatus) {
+            const po = purchaseOrders.find(p => p.id === poId);
+            if (!po || !['Pending', 'Accepted', 'Approved', 'Processing', 'Mark Shipped', 'Shipped', 'Received Delivery', 'Fulfilled', 'Rejected'].includes(nextStatus)) return;
+            const previousStatus = po.status;
+            if (previousStatus === nextStatus) return;
+            // Only add received stock when an order first becomes fulfilled.
+            if (nextStatus === 'Fulfilled' && !po.stockReceived) {
+                const item = items.find(i => i.id === po.itemId);
+                if (item) item.stock += po.quantity;
+                po.stockReceived = true;
+            }
+            po.status = nextStatus;
+            pushNotification('PO Status Updated', `${po.id} status changed to ${nextStatus}.`);
+            renderPOTable();
+            renderInventoryTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+        }
+
+        function deletePurchaseOrder(poId) {
+            const po = purchaseOrders.find(p => p.id === poId);
+            if (!po) return;
+            if (!confirm(`Delete purchase order ${poId}? This cannot be undone.`)) return;
+            purchaseOrders = purchaseOrders.filter(p => p.id !== poId);
+            pushNotification('Purchase Order Deleted', `${poId} was deleted.`);
+            renderPOTable();
+            updateDashboardMetrics();
+            updateCharts();
+        }
+
+        function openProfileModal() { document.getElementById('modal-profile').classList.remove('hidden'); }
+        function closeProfileModal() { document.getElementById('modal-profile').classList.add('hidden'); }
+        function openDeleteAllConfirmation() { document.getElementById('modal-delete-all-confirm').classList.remove('hidden'); }
+        function closeDeleteAllConfirmation() { document.getElementById('modal-delete-all-confirm').classList.add('hidden'); }
+        function deleteAllData() {
+            categories = [];
+            vendors = [];
+            items = [];
+            purchaseOrders = [];
+            notifications = [];
+            saveAppData();
+            closeDeleteAllConfirmation();
+            closeProfileModal();
+            renderCategoryPills();
+            renderVendorsTable();
+            renderInventoryTable();
+            renderPOTable();
+            renderNotifications();
+            updateDashboardMetrics();
+            updateCharts();
+            alert('All saved data has been permanently deleted.');
+        }
+
+        function advancePO(poId, nextStatus) {
+            const po = purchaseOrders.find(p => p.id === poId);
+            if (po) {
+                po.status = nextStatus;
+
+                if (nextStatus === 'Fulfilled') {
+                    const item = items.find(i => i.id === po.itemId);
+                    let stockAdded = false;
+                    if (item && !po.stockReceived) {
+                        item.stock += po.quantity;
+                        po.stockReceived = true;
+                        stockAdded = true;
+                    }
+                    pushNotification('PO Fulfilled', `${po.id} fulfilled. ${stockAdded ? `Added ${po.quantity} units to ${item.name}.` : 'Order status updated.'}`);
+                } else {
+                    pushNotification('PO Status Transition', `${po.id} moved to ${nextStatus}.`);
+                }
+
+                updateDashboardMetrics();
+                renderPOTable();
+                renderInventoryTable();
+                updateCharts();
+                saveAppData();
+            }
+        }
+
+        function updateDashboardMetrics() {
+            document.getElementById('stat-total-vendors').textContent = vendors.length;
+            document.getElementById('stat-total-skus').textContent = items.length;
+            document.getElementById('stat-categories-count').textContent = categories.length;
+
+            const pendingCount = purchaseOrders.filter(p => p.status === 'Pending').length;
+            document.getElementById('stat-pending-orders').textContent = pendingCount;
+
+            const totalSpend = purchaseOrders
+                .filter(p => p.status === 'Fulfilled' || p.status === 'Approved' || p.status === 'Mark Shipped')
+                .reduce((sum, p) => sum + p.totalCost, 0);
+
+            document.getElementById('stat-total-spend').textContent = `$${totalSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function updateCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+            // Stock by Item Column Chart
+            const itemLabels = items.map(item => item.name);
+            const itemStockLevels = items.map(item => Number(item.stock) || 0);
+
+            const catCtx = document.getElementById('categoryChart').getContext('2d');
+            if (categoryChartInstance) categoryChartInstance.destroy();
+
+            categoryChartInstance = new Chart(catCtx, {
+                type: 'bar',
+                data: {
+                    labels: itemLabels,
+                    datasets: [{
+                        label: 'Stock Level',
+                        data: itemStockLevels,
+                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                        hoverBackgroundColor: '#818cf8',
+                        borderColor: '#6366f1',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        maxBarThickness: 42
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    return `Stock Level: ${context.parsed.y} units`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: textColor,
+                                font: { size: 10, family: 'Plus Jakarta Sans' },
+                                autoSkip: true,
+                                maxRotation: 45,
+                                minRotation: 0
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: textColor,
+                                precision: 0
+                            },
+                            grid: { color: gridColor },
+                            title: {
+                                display: true,
+                                text: 'Units in Stock',
+                                color: textColor,
+                                font: { size: 10 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // PO Velocity Chart
+            const statuses = ['Pending', 'Approved', 'Mark Shipped', 'Received Delivery', 'Fulfilled'];
+            const statusCounts = statuses.map(s => purchaseOrders.filter(p => p.status === s).length);
+
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            statusChartInstance = new Chart(statusCtx, {
+                type: 'bar',
+                data: {
+                    labels: statuses,
+                    datasets: [{
+                        label: 'PO Count',
+                        data: statusCounts,
+                        backgroundColor: ['#f59e0b', '#6366f1', '#06b6d4', '#a855f7', '#10b981'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: textColor, font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: textColor, precision: 0 }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        function pushNotification(title, text) {
+            notifications.unshift({
+                id: 'n-' + Date.now(),
+                title,
+                text,
+                time: 'Just now',
+                unread: true
+            });
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const badge = document.getElementById('notif-badge');
+            const hasUnread = notifications.some(n => n.unread);
+
+            badge.style.display = hasUnread ? 'block' : 'none';
+
+            list.innerHTML = notifications.length ? notifications.map(n => `
+        <div class="p-3 hover:bg-slate-100 dark:hover:bg-slate-800/40 transition flex items-start space-x-2.5">
+          <div class="w-2 h-2 rounded-full bg-indigo-500 mt-1 shrink-0 ${n.unread ? '' : 'opacity-0'}"></div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center">
+              <p class="text-xs font-bold text-slate-900 dark:text-white">${n.title}</p>
+              <span class="text-[9px] text-slate-400 dark:text-slate-500">${n.time}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">${n.text}</p>
+          </div>
+        </div>
+      `).join('') : `<div class="p-4 text-center text-xs text-slate-400 dark:text-slate-500">No new notifications</div>`;
+            saveAppData();
+        }
+
+        function toggleNotifDrawer() {
+            const drawer = document.getElementById('notif-drawer');
+            drawer.classList.toggle('hidden');
+            notifications.forEach(n => n.unread = false);
+            document.getElementById('notif-badge').style.display = 'none';
+            saveAppData();
+        }
+
+        function clearAllNotifications() {
+            notifications = [];
+            renderNotifications();
+        }
+
+        // Modal Controls
+        function openCategoryModal() { document.getElementById('modal-categories').classList.remove('hidden'); }
+        function closeCategoryModal() { document.getElementById('modal-categories').classList.add('hidden'); }
+
+        function handleCreateCategory(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-cat-name').value.trim();
+            const color = document.getElementById('new-cat-color').value;
+            const desc = document.getElementById('new-cat-desc').value.trim();
+
+            if (name) {
+                categories.push({ id: 'cat-' + Date.now(), name, color, desc });
+                document.getElementById('new-cat-name').value = '';
+                document.getElementById('new-cat-desc').value = '';
+                renderCategoryPills();
+                updateDashboardMetrics();
+                updateCharts();
+                closeCategoryModal();
+            }
+        }
+
+        function removeCategory(id) {
+            categories = categories.filter(c => c.id !== id);
+            renderCategoryPills();
+            renderVendorsTable();
+            renderInventoryTable();
+            updateDashboardMetrics();
+            updateCharts();
+        }
+
+        let editingVendorId = null;
+
+        function openVendorModal(id = null) {
+            const form = document.getElementById('vendor-form');
+            form.reset();
+            
+
+            editingVendorId = id;
+            document.getElementById('vendor-modal-title').textContent =
+                id ? 'Edit Vendor Details' : 'Register New Vendor';
+
+            if (id) {
+                const vendor = vendors.find(v => v.id === id);
+                if (!vendor) return;
+
+                document.getElementById('v-name').value = vendor.name;
+                document.getElementById('v-category').value = vendor.categoryId;
+                document.getElementById('v-email').value = vendor.email;
+                document.getElementById('v-phone').value = vendor.phone;
+                
+            }
+
+            document.getElementById('modal-vendor').classList.remove('hidden');
+        }
+
+        function handleCreateVendor(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('v-name').value.trim();
+            const categoryId = document.getElementById('v-category').value;
+            const email = document.getElementById('v-email').value.trim();
+            const phone = document.getElementById('v-phone').value.trim();
+            
+
+            let savedVendor;
+            if (editingVendorId) {
+                const vendor = vendors.find(v => v.id === editingVendorId);
+                if (!vendor) return;
+                Object.assign(vendor, { name, categoryId, email, phone }); savedVendor = vendor;
+                pushNotification('Vendor Updated', `${name}'s details were updated.`);
+            } else {
+                savedVendor = { id: 'v-' + Date.now(), name, categoryId, email, phone, rating: 5 };
+                vendors.push(savedVendor);
+                pushNotification('Vendor Registered', `${name} was added.`);
+            }
+            saveAppData();
+            renderVendorsTable(); renderCategoryPills(); updateDashboardMetrics(); renderPOTable(); closeVendorModal();
+        }
+
+        function closeVendorModal() {
+            document.getElementById('modal-vendor').classList.add('hidden');
+            editingVendorId = null;
+        }
+
+
+        function deleteVendor(id) {
+            if (!confirm('Delete this vendor?')) return;
+            vendors = vendors.filter(v => v.id !== id);
+            renderVendorsTable();
+            renderPOTable();
+            updateDashboardMetrics();
+            saveAppData();
+        }
+
+        function openItemModal() {
+            const vendorSelect = document.getElementById('item-vendor-select');
+            vendorSelect.innerHTML = vendors.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+            document.getElementById('modal-item').classList.remove('hidden');
+        }
+        function closeItemModal() { document.getElementById('modal-item').classList.add('hidden'); }
+
+        function handleCreateItem(e) {
+            e.preventDefault();
+            const vendorId = document.getElementById('item-vendor-select').value;
+            const categoryId = document.getElementById('item-cat-select').value;
+            const name = document.getElementById('item-name').value.trim();
+            const price = parseFloat(document.getElementById('item-price').value);
+            const stock = parseInt(document.getElementById('item-stock').value, 10);
+
+            items.push({ id: 'sku-' + Date.now(), name, vendorId, categoryId, price, stock });
+
+            renderInventoryTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+            closeItemModal();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(i => i.id !== id);
+            renderInventoryTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+        }
+
+        function openAdjustModal(itemId) {
+            const item = getItem(itemId);
+
+            document.getElementById('adj-item-id').value = item.id;
+            document.getElementById('adj-item-name').textContent = item.name;
+
+            document.getElementById('adj-current-stock-display').textContent = item.stock;
+            document.getElementById('adj-quantity').value = item.stock;
+
+            document.getElementById('modal-adjust-stock').classList.remove('hidden');
+        }
+        function closeAdjustModal() { document.getElementById('modal-adjust-stock').classList.add('hidden'); }
+
+        function handleStockAdjustmentSubmit(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('adj-item-id').value;
+            const newStock = Number(
+                document.getElementById('adj-quantity').value
+            );
+            const reason = document.getElementById('adj-reason').value;
+
+            const item = items.find(i => i.id === id);
+
+            if (!item || !Number.isInteger(newStock) || newStock < 0) {
+                alert('Enter a valid whole number of 0 or more.');
+                return;
+            }
+
+            const oldStock = item.stock;
+            item.stock = newStock;
+
+            pushNotification(
+                'Stock Adjusted',
+                `${item.name}: ${oldStock} → ${newStock} units. Reason: ${reason}.`
+            );
+
+            renderInventoryTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+
+            closeAdjustModal();
+        }
+
+        function openNewPOModal() {
+            const vendorSelect = document.getElementById('po-vendor-select');
+            vendorSelect.innerHTML = vendors.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+            updatePOItemsDropdown();
+            document.getElementById('modal-po').classList.remove('hidden');
+        }
+        function closeNewPOModal() { document.getElementById('modal-po').classList.add('hidden'); }
+
+        function updatePOItemsDropdown() {
+            const vendorId = document.getElementById('po-vendor-select').value;
+            const itemSelect = document.getElementById('po-item-select');
+            const vendorItems = items.filter(i => i.vendorId === vendorId);
+
+            itemSelect.innerHTML = vendorItems.length
+                ? vendorItems.map(i => `<option value="${i.id}">${i.name} ($${i.price})</option>`).join('')
+                : `<option value="">No SKUs for this vendor</option>`;
+        }
+
+        function handleCreatePO(e) {
+            e.preventDefault();
+            const vendorId = document.getElementById('po-vendor-select').value;
+            const itemId = document.getElementById('po-item-select').value;
+            const quantity = parseInt(document.getElementById('po-quantity').value, 10);
+
+            const item = getItem(itemId);
+            const totalCost = item.price * quantity;
+
+            purchaseOrders.unshift({
+                id: 'PO-' + Math.floor(1000 + Math.random() * 9000),
+                vendorId,
+                categoryId: item.categoryId,
+                itemId,
+                quantity,
+                totalCost,
+                status: 'Pending',
+                date: new Date().toISOString().split('T')[0]
+            });
+
+            pushNotification('New Order Created', `Purchase order for ${quantity}x ${item.name} issued.`);
+
+            renderPOTable();
+            updateDashboardMetrics();
+            updateCharts();
+            saveAppData();
+            closeNewPOModal();
+        }
+
+        function handleGlobalSearch(term) {
+            if (!term) return;
+            const query = term.toLowerCase();
+            document.getElementById('inventory-search-input').value = query;
+            document.getElementById('vendor-search-input').value = query;
+            renderInventoryTable();
+            renderVendorsTable();
+        }
+
+        // Initialization on load
+        window.onload = function () {
+            loadAppData();
+            initTheme();
+            renderCategoryPills();
+            renderVendorsTable();
+            renderInventoryTable();
+            renderPOTable();
+            renderNotifications();
+            updateDashboardMetrics();
+            updateCharts();
+            startAdminSync();
+        };
+
+        function renderLowStockSuggestions() {
+            const container = document.getElementById('low-stock-suggestions');
+
+            const lowItems = items.filter(item => item.stock <= 20);
+
+            if (lowItems.length === 0) {
+                container.innerHTML = `
+            <p class="text-xs text-emerald-600 dark:text-emerald-400">
+                All stock levels are healthy. No restocking needed.
+            </p>`;
+                return;
+            }
+
+            container.innerHTML = lowItems.map(item => {
+                const suggestedQty = Math.max(0, 25 - item.stock);
+
+                return `
+            <div class="flex flex-col sm:flex-row sm:items-center
+                        justify-between gap-3 p-3 rounded-xl
+                        bg-slate-100 dark:bg-slate-900/70
+                        border border-slate-200 dark:border-slate-800">
+
+                <div>
+                    <p class="font-semibold text-xs text-slate-900 dark:text-white">
+                        ${item.name}
+                    </p>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        Current stock: ${item.stock}
+                        · Suggested purchase: ${suggestedQty} units
+                    </p>
+                </div>
+
+                <button type="button"
+                    onclick="openSuggestedPO('${item.id}', ${suggestedQty})"
+                    class="px-3 py-2 bg-indigo-600 hover:bg-indigo-500
+                           text-white rounded-lg text-xs font-semibold">
+                    Create Purchase Order
+                </button>
+            </div>`;
+            }).join('');
+        }
+
+        function openSuggestedPO(itemId, quantity) {
+            const item = items.find(i => i.id === itemId);
+
+            if (!item) return;
+
+            if (!vendors.some(v => v.id === item.vendorId)) {
+                alert('Please assign a valid vendor to this item first.');
+                return;
+            }
+
+            openNewPOModal();
+
+            document.getElementById('po-vendor-select').value = item.vendorId;
+            updatePOItemsDropdown();
+
+            document.getElementById('po-item-select').value = item.id;
+            document.getElementById('po-quantity').value = quantity;
+        }
+
+
+
+
+
+        function exportMonthlyPOs() {
+            if (typeof XLSX === 'undefined') {
+                alert('Excel library not loaded. Check the XLSX script in your HTML head.');
+                return;
+            }
+
+            const month = document.getElementById('po-month-filter').value;
+            const status = document.getElementById('po-status-filter').value;
+
+            const orders = purchaseOrders.filter(po =>
+                (!month || po.date.startsWith(month)) &&
+                (status === 'ALL' || po.status === status)
+            );
+
+            const totalPOValue = orders.reduce(
+                (sum, po) => sum + Number(po.totalCost || 0), 0
+            );
+
+            const hasPaymentData = orders.every(po =>
+                po.amountPaid !== undefined && po.amountPaid !== null
+            );
+
+            const totalPaid = hasPaymentData
+                ? orders.reduce((sum, po) => sum + Number(po.amountPaid || 0), 0)
+                : null;
+
+            const outstanding = hasPaymentData
+                ? orders.reduce((sum, po) =>
+                    sum + Math.max(
+                        0,
+                        Number(po.totalCost || 0) - Number(po.amountPaid || 0)
+                    ), 0)
+                : null;
+
+            const rows = [
+                ['OMNIVENDOR — EXPENSE SUMMARY'],
+                [],
+                ['Metric', 'Value'],
+                ['Total PO Value', totalPOValue],
+                ['Total Orders', orders.length],
+                ['Total Paid', totalPaid ?? 'Payment data not recorded'],
+                ['Outstanding Balance', outstanding ?? 'Payment data not recorded'],
+                [],
+                ['PURCHASE ORDERS'],
+                [],
+                [
+                    'PO Number',
+                    'Order Date',
+                    'Vendor Name',
+                    'Category',
+                    'Items & Quantity',
+                    'Total Amount',
+                    'Order Status'
+                ],
+                ...orders.map(po => {
+                    const item = getItem(po.itemId);
+
+                    return [
+                        po.id,
+                        po.date,
+                        getVendor(po.vendorId).name,
+                        getCategory(po.categoryId).name,
+                        `${item.name} × ${po.quantity}`,
+                        Number(po.totalCost || 0),
+                        po.status
+                    ];
+                })
+            ];
+
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+            // Set column widths
+            worksheet['!cols'] = [
+                { wch: 15 },
+                { wch: 14 },
+                { wch: 24 },
+                { wch: 22 },
+                { wch: 35 },
+                { wch: 16 },
+                { wch: 18 }
+            ];
+
+            // Merge title cells
+            worksheet['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+                { s: { r: 8, c: 0 }, e: { r: 8, c: 6 } }
+            ];
+
+            // Add borders and bold formatting to purchase order headers
+
+            const headerRow = rows.findIndex(row => row[0] === 'PO Number');
+
+            for (let col = 0; col < 7; col++) {
+                const cellAddress = XLSX.utils.encode_cell({
+                    r: headerRow,
+                    c: col
+                });
+
+                if (worksheet[cellAddress]) {
+                    worksheet[cellAddress].s = {
+                        font: {
+                            bold: true,
+                            color: { rgb: '000000' }
+                        },
+                        alignment: {
+                            horizontal: 'center',
+                            vertical: 'center'
+                        },
+                        border: {
+                            top: { style: 'thin', color: { rgb: '000000' } },
+                            bottom: { style: 'thin', color: { rgb: '000000' } },
+                            left: { style: 'thin', color: { rgb: '000000' } },
+                            right: { style: 'thin', color: { rgb: '000000' } }
+                        }
+                    };
+                }
+            }
+
+
+            const workbook = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(
+                workbook,
+                worksheet,
+                'Expense Report'
+            );
+
+            XLSX.writeFile(
+                workbook,
+                `OmniVendor_Expenses_${month || 'All'}.xlsx`
+            );
+        }
+
+    </script>
+</body>
+
+</html>

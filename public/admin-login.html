@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OmniVendor — Admin Login</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body{font-family:'Plus Jakarta Sans',sans-serif}.panel{background:rgba(15,23,42,.78);border:1px solid rgba(255,255,255,.09);backdrop-filter:blur(16px)}input{color:#e2e8f0}</style>
+</head>
+<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex items-center justify-center p-5">
+<form id="admin-form" class="panel w-full max-w-md rounded-3xl p-8 shadow-2xl" onsubmit="loginAdmin(event)">
+<div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl mb-5"><i class="fa-solid fa-shield-halved"></i></div>
+<p class="text-xs uppercase tracking-[.2em] text-indigo-400 font-bold">OmniVendor</p><h1 class="text-2xl font-extrabold mt-2">Admin Login</h1><p class="text-sm text-slate-400 mt-2 mb-6">Sign in to manage vendors, inventory and purchase orders.</p>
+<label class="text-xs font-semibold">Admin email</label><input id="email" type="email" required autocomplete="username" class="w-full mt-1 mb-4 rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm" placeholder="admin@example.com">
+<label class="text-xs font-semibold">Password</label><input id="password" type="password" required autocomplete="current-password" class="w-full mt-1 mb-5 rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm" placeholder="Admin password">
+<button id="submit" class="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 text-sm">Sign in</button><p id="error" class="text-sm text-rose-400 mt-4 hidden"></p>
+<p class="text-xs text-slate-500 mt-5">Vendor? <a href="/vendor.html" class="text-indigo-400 font-semibold hover:underline">Open vendor portal</a></p>
+</form>
+<script>
+if(sessionStorage.getItem('omni_admin_token')) location.replace('/admin.html');
+async function loginAdmin(e){e.preventDefault();const error=document.getElementById('error');error.classList.add('hidden');try{const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('email').value,password:document.getElementById('password').value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||'Login failed');sessionStorage.setItem('omni_admin_token',d.token);location.href='/admin.html';}catch(err){error.textContent=err.message;error.classList.remove('hidden');}}
+</script></body></html>

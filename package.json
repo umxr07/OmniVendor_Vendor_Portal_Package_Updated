@@ -1,0 +1,14 @@
+{
+  "name": "omnivendor-shared-portal",
+  "version": "1.1.0",
+  "description": "OmniVendor admin and vendor portal with JSON file storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
